@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class PlayerMovement : BaseBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     public int lives = 3;
     public float movementSpeed = 5f;
@@ -31,9 +31,6 @@ public class PlayerMovement : BaseBehaviour
             isDoubleJumping = false;
         }
 
-        float moveInput = Input.GetAxis("Horizontal");
-        rb.linearVelocity = new Vector2(moveInput * movementSpeed, rb.linearVelocityY);
-
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (isGrounded)
@@ -48,23 +45,24 @@ public class PlayerMovement : BaseBehaviour
             }
         }
 
-        SetAnimation(moveInput);
     }
 
     private void FixedUpdate()
     {
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        isGrounded = Physics2D.OverlapCircle(
+            groundCheck.position,
+            groundCheckRadius,
+            groundLayer
+        );
 
-        if (rb.linearVelocity.magnitude < 0.05f &&
-            rb.IsTouchingLayers())
-        {
-            Debug.Log(
-                $"Player quase parado. " +
-                $"Velocidade: {rb.linearVelocity}, " +
-                $"Posição: {rb.position}",
-                this
-            );
-        }
+        float moveInput = Input.GetAxisRaw("Horizontal");
+
+        rb.linearVelocity = new Vector2(
+            moveInput * movementSpeed,
+            rb.linearVelocityY
+        );
+
+        SetAnimation(moveInput);
     }
 
     private void SetAnimation(float moveInput)

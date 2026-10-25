@@ -1,6 +1,7 @@
 using UnityEngine;
+using System.Collections;
 
-public class MovingPlataform : BaseBehaviour
+public class MovingPlataform : MonoBehaviour
 {
     public float speed = 2f;
     public float waitSeconds = 1f;
@@ -15,15 +16,23 @@ public class MovingPlataform : BaseBehaviour
     {
         if(Vector2.Distance(transform.position, points[i].position) < 0.01f)
         {
+            StartCoroutine(StandCoroutine());
             i++;
             if(i == points.Length)
             {
                 i = 0;
             }
-            StartCoroutine(WaitCoroutine(waitSeconds));
         }
+        else
+        {
+            transform.position = Vector2.MoveTowards(transform.position, points[i].position, speed * Time.deltaTime);
+        }
+    }
 
-        transform.position = Vector2.MoveTowards(transform.position, points[i].position, speed * Time.deltaTime);
+    private IEnumerator StandCoroutine()
+    {
+        transform.position = points[i].position;
+        yield return new WaitForSeconds(waitSeconds);
     }
 
     void OnCollisionEnter2D(Collision2D collision)
