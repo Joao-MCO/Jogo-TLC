@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class CameraFollow : MonoBehaviour
+public class CameraFollow : BaseBehaviour
 {
     public GameObject player;
     public float speed = 3f;

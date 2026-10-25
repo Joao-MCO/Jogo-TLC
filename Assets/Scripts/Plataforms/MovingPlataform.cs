@@ -1,8 +1,9 @@
 using UnityEngine;
 
-public class MovingPlataform : MonoBehaviour
+public class MovingPlataform : BaseBehaviour
 {
     public float speed = 2f;
+    public float waitSeconds = 1f;
     public Transform[] points;
 
     private int i;
@@ -19,6 +20,7 @@ public class MovingPlataform : MonoBehaviour
             {
                 i = 0;
             }
+            StartCoroutine(WaitCoroutine(waitSeconds));
         }
 
         transform.position = Vector2.MoveTowards(transform.position, points[i].position, speed * Time.deltaTime);

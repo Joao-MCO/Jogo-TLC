@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : BaseBehaviour
 {
     public int lives = 3;
     public float movementSpeed = 5f;
@@ -49,12 +49,22 @@ public class PlayerMovement : MonoBehaviour
         }
 
         SetAnimation(moveInput);
-
     }
 
     private void FixedUpdate()
     {
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+
+        if (rb.linearVelocity.magnitude < 0.05f &&
+            rb.IsTouchingLayers())
+        {
+            Debug.Log(
+                $"Player quase parado. " +
+                $"Velocidade: {rb.linearVelocity}, " +
+                $"Posição: {rb.position}",
+                this
+            );
+        }
     }
 
     private void SetAnimation(float moveInput)
