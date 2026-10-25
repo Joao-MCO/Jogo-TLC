@@ -16,6 +16,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isGrounded;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
+    private bool isDoubleJumping;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -27,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
         if (isGrounded)
         {        
             extraJumps = extraJumpsValue;
+            isDoubleJumping = false;
         }
 
         float moveInput = Input.GetAxis("Horizontal");
@@ -41,6 +43,7 @@ public class PlayerMovement : MonoBehaviour
             else if(extraJumps > 0)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocityX, dobuleJumpForce);
+                isDoubleJumping = true;
                 extraJumps--;
             }
         }
@@ -73,7 +76,9 @@ public class PlayerMovement : MonoBehaviour
         {
             if(rb.linearVelocityY > 0)
             {
-                animator.Play("Jump");
+                if(isDoubleJumping) animator.Play("Double Jump");
+                else animator.Play("Jump");
+                
             }
             else
             {
@@ -91,7 +96,7 @@ public class PlayerMovement : MonoBehaviour
             StartCoroutine(BlinkRed());
         }
 
-        if(lives == 0)
+        if(lives == 0 || collision.gameObject.tag == "Die")
         {
             Die();
         }
