@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Damage
   - Die
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -15,8 +16,8 @@ TagManager:
   - UI
   - Player
   - Ground
+  - Enemy
   - Others
-  - 
   - 
   - 
   - 
