@@ -35,6 +35,8 @@ public class Collectable : MonoBehaviour
     {
         if(collision.gameObject.tag == "Player")
         {
+            Player player = collision.gameObject.GetComponent<Player>();
+            player.collectables += 1;
             StartCoroutine(collected());
         }
     }
@@ -43,6 +45,6 @@ public class Collectable : MonoBehaviour
     {
         animator.Play("Collected");
         yield return new WaitForSeconds(0.5f);
-        gameObject.SetActive(false);
+        Destroy(gameObject);
     }
 }

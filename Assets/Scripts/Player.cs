@@ -4,6 +4,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public int lives = 3;
+    public int collectables = 0;
     public float movementSpeed = 5f;
     public float jumpForce = 10f;
     public float dobuleJumpForce = 5f;
