@@ -1,7 +1,9 @@
+using System.Collections;
 using UnityEngine;
 
 public class Miscelaneous : MonoBehaviour
 {
+    public bool endpoint;
     private bool checkered;
     private Animator animator;
     void Start()
@@ -20,8 +22,15 @@ public class Miscelaneous : MonoBehaviour
     {
         if(collision.gameObject.tag == "Player" && !checkered)
         {
-            animator.Play("Triggered");
-            checkered = true;
+            StartCoroutine(action());
         }
+    }
+
+    IEnumerator action()
+    {
+        animator.Play("Triggered");
+        checkered = true;
+        yield return new WaitForSeconds(1f);
+        if(endpoint) UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
     }
 }
