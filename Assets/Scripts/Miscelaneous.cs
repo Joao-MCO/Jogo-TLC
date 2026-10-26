@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MiscelaneousScript : MonoBehaviour
+public class Miscelaneous : MonoBehaviour
 {
     private bool checkered;
     private Animator animator;
