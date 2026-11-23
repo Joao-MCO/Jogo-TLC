@@ -1,5 +1,8 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 public class Player : MonoBehaviour
 {
@@ -7,7 +10,9 @@ public class Player : MonoBehaviour
     public int collectables = 0;
     public float movementSpeed = 5f;
     public float jumpForce = 10f;
-    public float dobuleJumpForce = 5f;
+    [FormerlySerializedAs("dobuleJumpForce")]
+    public float doubleJumpForce = 5f;
+    public float invincibleSeconds = 1f;
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
     public LayerMask groundLayer;
@@ -18,6 +23,7 @@ public class Player : MonoBehaviour
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     private bool isDoubleJumping;
+    private float invincibleUntil;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -32,7 +38,7 @@ public class Player : MonoBehaviour
             isDoubleJumping = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (JumpPressed())
         {
             if (isGrounded)
             {
@@ -40,7 +46,7 @@ public class Player : MonoBehaviour
             }
             else if(extraJumps > 0)
             {
-                rb.linearVelocity = new Vector2(rb.linearVelocityX, dobuleJumpForce);
+                rb.linearVelocity = new Vector2(rb.linearVelocityX, doubleJumpForce);
                 isDoubleJumping = true;
                 extraJumps--;
             }
@@ -56,7 +62,7 @@ public class Player : MonoBehaviour
             groundLayer
         );
 
-        float moveInput = Input.GetAxisRaw("Horizontal");
+        float moveInput = ReadMoveInput();
 
         rb.linearVelocity = new Vector2(
             moveInput * movementSpeed,
@@ -64,6 +70,37 @@ public class Player : MonoBehaviour
         );
 
         SetAnimation(moveInput);
+    }
+
+    // Equivalente a Input.GetKeyDown(KeyCode.Space), com suporte a gamepad.
+    private bool JumpPressed()
+    {
+        Keyboard keyboard = Keyboard.current;
+        Gamepad gamepad = Gamepad.current;
+        return (keyboard != null && keyboard.spaceKey.wasPressedThisFrame)
+            || (gamepad != null && gamepad.buttonSouth.wasPressedThisFrame);
+    }
+
+    // Equivalente a Input.GetAxisRaw("Horizontal"): retorna -1, 0 ou 1.
+    private float ReadMoveInput()
+    {
+        float move = 0f;
+
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard != null)
+        {
+            if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed) move -= 1f;
+            if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed) move += 1f;
+        }
+
+        Gamepad gamepad = Gamepad.current;
+        if (move == 0f && gamepad != null)
+        {
+            float stick = gamepad.leftStick.x.ReadValue() + gamepad.dpad.x.ReadValue();
+            if (Mathf.Abs(stick) > 0.5f) move = Mathf.Sign(stick);
+        }
+
+        return move;
     }
 
     private void SetAnimation(float moveInput)
@@ -76,8 +113,8 @@ public class Player : MonoBehaviour
             }else
             {
                 Vector3 scale = animator.transform.localScale;
-                if (moveInput < 0) scale.x = -1;
-                else scale.x = 1;
+                scale.x = Mathf.Abs(scale.x) * Mathf.Sign(moveInput);
+                animator.transform.localScale = scale;
                 animator.Play("Walk");
             }
         }
@@ -98,14 +135,15 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.tag == "Damage")
+        if (collision.gameObject.CompareTag("Damage") && Time.time >= invincibleUntil)
         {
             lives--;
+            invincibleUntil = Time.time + invincibleSeconds;
             rb.linearVelocity = new Vector2(rb.linearVelocityX, jumpForce);
             StartCoroutine(BlinkRed());
         }
 
-        if(lives == 0 || collision.gameObject.tag == "Die")
+        if (lives <= 0 || collision.gameObject.CompareTag("Die"))
         {
             Die();
         }
@@ -120,6 +158,6 @@ public class Player : MonoBehaviour
 
     private void Die()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

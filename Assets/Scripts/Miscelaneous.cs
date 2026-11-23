@@ -1,36 +1,31 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Miscelaneous : MonoBehaviour
 {
     public bool endpoint;
-    private bool checkered;
+    private bool isTriggered;
     private Animator animator;
+
     void Start()
     {
         animator = GetComponent<Animator>();
-        checkered = false;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.tag == "Player" && !checkered)
+        if (collision.gameObject.CompareTag("Player") && !isTriggered)
         {
-            StartCoroutine(action());
+            StartCoroutine(Trigger());
         }
     }
 
-    IEnumerator action()
+    IEnumerator Trigger()
     {
         animator.Play("Triggered");
-        checkered = true;
+        isTriggered = true;
         yield return new WaitForSeconds(1f);
-        if(endpoint) UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
+        if (endpoint) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

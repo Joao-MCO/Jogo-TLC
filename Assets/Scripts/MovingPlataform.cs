@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class MovingPlataform : MonoBehaviour
 {
@@ -8,20 +7,22 @@ public class MovingPlataform : MonoBehaviour
     public Transform[] points;
 
     private int i;
+    private float waitUntil;
+
     void Start()
     {
         transform.position = points[0].position;
     }
+
     void Update()
     {
-        if(Vector2.Distance(transform.position, points[i].position) < 0.01f)
+        if (Time.time < waitUntil) return;
+
+        if (Vector2.Distance(transform.position, points[i].position) < 0.01f)
         {
-            StartCoroutine(StandCoroutine());
-            i++;
-            if(i == points.Length)
-            {
-                i = 0;
-            }
+            transform.position = points[i].position;
+            waitUntil = Time.time + waitSeconds;
+            i = (i + 1) % points.Length;
         }
         else
         {
@@ -29,15 +30,9 @@ public class MovingPlataform : MonoBehaviour
         }
     }
 
-    private IEnumerator StandCoroutine()
-    {
-        transform.position = points[i].position;
-        yield return new WaitForSeconds(waitSeconds);
-    }
-
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Player")
+        if (collision.gameObject.CompareTag("Player"))
         {
             collision.transform.SetParent(transform);
         }
@@ -45,7 +40,7 @@ public class MovingPlataform : MonoBehaviour
 
     void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Player")
+        if (collision.gameObject.CompareTag("Player"))
         {
             collision.transform.SetParent(null);
         }
